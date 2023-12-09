@@ -1,0 +1,5 @@
+.bordered {
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 30;
+}
