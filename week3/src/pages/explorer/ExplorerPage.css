@@ -1,25 +1,3 @@
-.Content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 90vw;
-}
-
-.BlockPage-header {
-    min-height: 8vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-}
-
-.SearchBlock {
-    display: flex;
-    justify-content: center;
-}
-
 .BlockList {
     display: flex;
     flex-direction: row;

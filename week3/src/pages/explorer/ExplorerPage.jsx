@@ -78,8 +78,8 @@ export default function ExplorerPage({alchemy}) {
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-            <Box className='BlockPage-header'>Block Explorer on [{alchemy.config.network}]</Box>
-            <Box className='SearchBlock'>
+            <Box className='page-header'>Block Explorer on [{alchemy.config.network}]</Box>
+            <Box className='search'>
                 <TextField id="block-search-input"
                             label="Search block"
                             helperText='Insert a block number or tag {latest, earliest, pending}'
@@ -88,7 +88,7 @@ export default function ExplorerPage({alchemy}) {
                             onKeyDown={e => e.key === 'Enter' && onSearch(searchInput)}/>
                 <Button variant="contained" size="large" sx={{height: '55px', marginLeft: 1}} onClick={() => onSearch(searchInput)}>Search</Button>
             </Box>
-            <Box className='Content'>
+            <Box className='content'>
                 <BlockList blocks={blockList} selected={selectedBlock} onSelect={onBlockSelection} />
                 {block?.transactions &&
                   <Transactions
