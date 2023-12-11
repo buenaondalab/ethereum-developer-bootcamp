@@ -25,27 +25,10 @@ export default function Transactions({block, selected, onSelect}) {
           </ListItem>
         );
       }
-
-      
-      
-      const [windowSize, setWindowSize] = useState({
-        height: window.innerHeight,
-        width: window.innerWidth,
-      });
-      console.log(windowSize);
-      
-      useEffect(() => {
-        const handleWindowResize = () => setWindowSize({
-          width: window.innerWidth,
-          height: window.innerHeight,
-        });
-        window.addEventListener('resize', handleWindowResize)
-        return window.removeEventListener('resize', handleWindowResize);
-    },[])
     
     useEffect(() => {
-      window.scroll({top: windowSize?.height, behaviour: "smooth"});      
-    }, [windowSize?.height]);
+      window.scroll({top: window?.innerHeight, behaviour: "smooth"});      
+    });
     
     return (
         <Box id='transactions' className="TransactionList bordered"
@@ -53,12 +36,13 @@ export default function Transactions({block, selected, onSelect}) {
                 borderRadius: 2,
                 borderColor: theme.palette.primary.dark,
                 height: 900,
+                width: window.innerWidth*0.9
             }}>
-            <Box sx={{backgroundColor: theme.palette.primary.dark, padding: 1}}>
+            <Box sx={{display: 'flex', flexDirection: 'column', backgroundColor: theme.palette.primary.dark, padding: 1}}>
               <Typography variant='h4'>Transactions</Typography>
               <Typography variant='body' marginLeft={1}>BLOCK {block?.number}</Typography>
             </Box>
-            <Box sx={{display: 'flex', flexDirection: 'row', flex: 1}}>
+            <Box sx={{display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0}}>
               <Box sx={{display: 'flex'}}>
               <FixedSizeList height={window.innerHeight/1.5} itemCount={block?.transactions.length} itemSize={72} width={'82ex'} overscanCount={5} itemData={block?.transactions}>
                   {Transaction}

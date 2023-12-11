@@ -19,13 +19,12 @@ export default function TransactionDetails({txn}) {
     return (
         <Box
             className='bordered'
-            sx={{display: 'flex', flexDirection: 'column', borderColor: 'darkseagreen', margin: 0, height: '813px', minWidth: 0}}
+            sx={{display: 'flex', flexDirection: 'column', borderColor: 'darkseagreen', margin: 0, height: '813px', minWidth: 0, width: '100%'}}
         >
             <Box sx={{
                 backgroundColor: 'darkseagreen',
                 alignItems: 'flex-end',
                 display: 'flex',
-                flexDirection: 'row',
                 padding: 1,
                 justifyContent: 'space-between',
                 flexWrap: 'wrap',

@@ -6,6 +6,7 @@ import './App.css';
 import { Box, Divider, Link, Typography } from '@mui/material'
 import ExplorerPage from './pages/explorer/ExplorerPage'
 import AccountPage from './pages/accounts/AccountPage'
+import NftPage from './pages/nfts/NftPage';
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -27,9 +28,9 @@ const alchemy = new Alchemy(settings);
 function renderPage(page) {
   switch(page) {
     case 'accounts': return <AccountPage alchemy={alchemy} />;
-    case 'nfts': return <div>NFTs Page</div>;  
+    case 'nfts': return <NftPage alchemy={alchemy} />;  
     case 'blocks':
-    default: return <ExplorerPage alchemy={alchemy}/>;
+    default: return <ExplorerPage alchemy={alchemy} />;
   }
 }
 

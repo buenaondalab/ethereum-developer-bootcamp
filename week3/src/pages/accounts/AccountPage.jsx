@@ -15,7 +15,7 @@ export default function AccountPage ({alchemy}) {
 
     useEffect(() => {
         address && alchemy.core.getBalance(address).then(b=> setBalance(Utils.formatEther(b)));
-    })
+    }, [address, alchemy.core])
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>

@@ -34,11 +34,3 @@
     transform: rotate(360deg);
   }
 }
-
-.Content {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  min-width: 80vw;
-  margin-top: 20px;
-}
