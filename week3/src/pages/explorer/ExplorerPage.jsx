@@ -3,6 +3,8 @@ import './ExplorerPage.css'
 import { useCallback, useEffect, useState } from "react"
 import Transactions from "./Transactions"
 import BlockList from "./BlockList"
+import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
+import LinkIcon from '@mui/icons-material/Link'
 
 const BLOCK_TAGS = ['pending', 'latest', 'earliest', 'safe', 'finalized'];
 
@@ -13,6 +15,7 @@ export default function ExplorerPage({alchemy}) {
     const [blockNumber, setBlockNumber] = useState('latest');
     const [selectedBlock, setSelectedBlock] = useState(); // block number
     const [selectedTxn, setSelectedTxn] = useState(); // tx hash?
+    const [liveMode, setLiveMode] = useState('OFF');
 
     const getBlockWithTransactions = useCallback(async (tag) => {
         let blockTag;
@@ -62,7 +65,14 @@ export default function ExplorerPage({alchemy}) {
       setBlock(null);
       setSelectedBlock(null);
       setSelectedTxn(null);
-    }, [])
+    }, []);
+
+    const onNewBlock = useCallback(async (blockNum) => {
+      const block = await alchemy.core.getBlock(blockNum);
+      blockList.unshift(block);
+      blockList.pop();
+      setBlockList([...blockList]);
+    }, [alchemy.core, blockList]);
 
       useEffect(() => {
         if(blockNumber) {
@@ -76,6 +86,23 @@ export default function ExplorerPage({alchemy}) {
         }
       },[getBlockWithTransactions, selectedBlock]);
 
+      async function manageLiveMode(mode) {
+        if(mode === 'ON' && await alchemy.ws.listenerCount('block') < 1) {
+          alchemy.ws.on(
+            'block',
+            onNewBlock
+          );
+          console.log('ON')
+        }
+        else if (mode === 'OFF') {
+          console.log('OFF');
+          // alchemy.ws.off(AlchemySubscription.PENDING_TRANSACTIONS)
+          alchemy.ws.removeAllListeners();
+        }
+        setLiveMode(mode);
+      };
+      
+      useEffect(() => () => alchemy.ws.removeAllListeners(), [alchemy.ws]);
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
             <Box className='page-header'>Block Explorer on [{alchemy.config.network}]</Box>
@@ -87,6 +114,11 @@ export default function ExplorerPage({alchemy}) {
                             onChange={e => setSearchInput(e.currentTarget.value)}
                             onKeyDown={e => e.key === 'Enter' && onSearch(searchInput)}/>
                 <Button variant="contained" size="large" sx={{height: '55px', marginLeft: 1}} onClick={() => onSearch(searchInput)}>Search</Button>
+            </Box>
+            <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+              {liveMode === 'OFF' ? <LinkOutlinedIcon sx={{marginX: 1}}/> : <LinkIcon className="live" sx={{marginX: 1}}/>}
+              <Button title={`Click to ${liveMode === 'ON' ? 'de' : ''}activate live mode`} variant="outlined" onClick={() => manageLiveMode(liveMode === 'OFF' ? 'ON' : 'OFF')}>LIVE MODE: {liveMode}</Button>
+              {liveMode === 'OFF' ? <LinkOutlinedIcon sx={{marginX: 1}}/> : <LinkIcon className="live" sx={{marginX: 1}}/>}
             </Box>
             <Box className='content'>
                 <BlockList blocks={blockList} selected={selectedBlock} onSelect={onBlockSelection} />

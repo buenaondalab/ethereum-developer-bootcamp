@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material"
+import { Box, Divider, Typography } from "@mui/material"
 import Block from "./Block"
 
 export default function BlockList({blocks, selected, onSelect}) {
@@ -10,13 +10,16 @@ export default function BlockList({blocks, selected, onSelect}) {
             justifyContent: 'center',
         }}>
             {blocks.map(
-                b => b && (
-                    <Box key={b.number}>
-                        <Block block={b} isSelected={b.number === selected} onSelect={() => onSelect(b.number)}/>
-                        <Divider color='greenyellow' sx={{margin: 1}}/>
+                (b, i, bb) => b && (
+                    <Box key={b.number} sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                        <Box>
+                            <Block block={b} isSelected={b.number === selected} onSelect={() => onSelect(b.number)}/>
+                            <Divider color='greenyellow' sx={{margin: 1}}/>
+                        </Box>
+                        {i < bb.length-1 && b.number - bb[i+1].number > 1 && <Typography variant={'h1'}>. . .</Typography>}
                     </Box>
-                ))
-            }            
+                )
+            )}            
         </Box>
     )
 }

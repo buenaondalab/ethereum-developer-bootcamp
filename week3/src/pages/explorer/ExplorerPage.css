@@ -10,3 +10,13 @@
     flex-direction: "column";
     margin: 15px;
 }
+
+.live {
+    animation: colorFading 1s infinite alternate;
+}
+
+@keyframes colorFading
+ {
+    from {color: red;}
+    to {color: lightgrey;}
+}

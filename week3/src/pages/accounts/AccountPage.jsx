@@ -1,8 +1,7 @@
-import { Box, Button, TextField, Typography } from "@mui/material"
+import { Box, Button, TextField } from "@mui/material"
 import { useCallback, useEffect, useState } from "react"
 import Account from "./Account"
 import { Utils } from "alchemy-sdk"
-import { FixedSizeList } from "react-window"
 import Transfers from "./Transfers"
 
 export default function AccountPage ({alchemy}) {
