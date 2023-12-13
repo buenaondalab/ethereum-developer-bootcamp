@@ -12,7 +12,6 @@ export default function ExplorerPage({alchemy}) {
     const [searchInput, setSearchInput] = useState('latest');
     const [block, setBlock] = useState();
     const [blockList, setBlockList] = useState([]);
-    const [blockNumber, setBlockNumber] = useState('latest');
     const [selectedBlock, setSelectedBlock] = useState(); // block number
     const [selectedTxn, setSelectedTxn] = useState(); // tx hash?
     const [liveMode, setLiveMode] = useState('OFF');
@@ -36,16 +35,22 @@ export default function ExplorerPage({alchemy}) {
       } else {
         blockTag = Number(tag);
       }
-      const block = await alchemy.core.getBlock(blockTag);
-      const list = [];
-      list.push(block);
-      for (let i = block.number - 1; i > block.number -5; i--) {
-          const b = await alchemy.core.getBlock(i);
-          list.push(b);
+      if(blockTag) {
+        console.log(`Getting block ${blockTag}`)
+        const block = await alchemy.core.getBlock(blockTag);
+        const list = [];
+        list.push(block);
+        for (let i = block.number - 1; i > block.number -5; i--) {
+            const b = await alchemy.core.getBlock(i);
+            list.push(b);
+        }
+        setBlockList([...list]);
+        console.log(block)
+      } else {
+        console.warn('Invalid block');
       }
-      setBlockList([...list]);
 
-      console.log(block)
+
     }, [alchemy.core]);
 
     const getTxn = useCallback(async (hash) => {
@@ -61,11 +66,11 @@ export default function ExplorerPage({alchemy}) {
     }, []);
 
     const onSearch = useCallback((input) => {
-      setBlockNumber(input);
+      getBlocks(input);
       setBlock(null);
       setSelectedBlock(null);
       setSelectedTxn(null);
-    }, []);
+    }, [getBlocks]);
 
     const onNewBlock = useCallback(async (blockNum) => {
       const block = await alchemy.core.getBlock(blockNum);
@@ -75,10 +80,10 @@ export default function ExplorerPage({alchemy}) {
     }, [alchemy.core, blockList]);
 
       useEffect(() => {
-        if(blockNumber) {
-            getBlocks(blockNumber);
+        if(blockList.length === 0) {
+            getBlocks('latest');
         }
-      }, [blockNumber, getBlocks])
+      }, [blockList.length, getBlocks])
     
       useEffect(() => {
         if(selectedBlock) {

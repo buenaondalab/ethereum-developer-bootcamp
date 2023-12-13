@@ -11,7 +11,7 @@ export default function BlockList({blocks, selected, onSelect}) {
         }}>
             {blocks.map(
                 (b, i, bb) => b && (
-                    <Box key={b.number} sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                    <Box key={b.number} sx={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start'}}>
                         <Box>
                             <Block block={b} isSelected={b.number === selected} onSelect={() => onSelect(b.number)}/>
                             <Divider color='greenyellow' sx={{margin: 1}}/>

@@ -7,6 +7,7 @@ import { Box, Divider, Link, Typography } from '@mui/material'
 import ExplorerPage from './pages/explorer/ExplorerPage'
 import AccountPage from './pages/accounts/AccountPage'
 import NftPage from './pages/nfts/NftPage';
+import TransactionPage from './pages/transactions/TransactionPage'
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -28,7 +29,8 @@ const alchemy = new Alchemy(settings);
 function renderPage(page) {
   switch(page) {
     case 'accounts': return <AccountPage alchemy={alchemy} />;
-    case 'nfts': return <NftPage alchemy={alchemy} />;  
+    case 'nfts': return <NftPage alchemy={alchemy} />;
+    case 'transactions': return <TransactionPage alchemy={alchemy} />;
     case 'blocks':
     default: return <ExplorerPage alchemy={alchemy} />;
   }
@@ -45,11 +47,13 @@ function App() {
     <Box className="App">
       <Box className='App-header'>
         <Box>
-          <Link href='#' onClick={() => navigate('accounts')}>Accounts</Link>
-           {' | '} 
-          <Link href='#' onClick={() => navigate('blocks')}>Blocks</Link>
-           {' | '} 
-          <Link href='#' onClick={() => navigate('nfts')}>NFTs</Link>
+          <Link href='#' onClick={() => navigate('accounts')} sx={page === 'accounts' ? {color: 'rgb(206, 250, 5)'} : {}}>Accounts</Link>
+          {' | '} 
+          <Link href='#' onClick={() => navigate('blocks')} sx={page === 'blocks' ? {color: 'rgb(206, 250, 5)'} : {}}>Blocks</Link>
+          {' | '} 
+          <Link href='#' onClick={() => navigate('transactions')} sx={page === 'transactions' ? {color: 'rgb(206, 250, 5)'} : {}}>Transactions</Link>
+          {' | '} 
+          <Link href='#' onClick={() => navigate('nfts')} sx={page === 'nfts' ? {color: 'rgb(206, 250, 5)'} : {}}>NFTs</Link>
         </Box>
         <Typography>Explorer on [{alchemy.config.network}]</Typography>
       </Box>
