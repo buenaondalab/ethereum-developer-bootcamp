@@ -14,7 +14,7 @@ contract Escrow {
 		depositor = tx.origin;
 	}
 
-	event Approved(uint);
+	event Approved(uint indexed);
 
 	function approve() external {
 		require(msg.sender == arbiter);
