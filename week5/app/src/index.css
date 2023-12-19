@@ -1,6 +1,7 @@
 body {
   background-color: #eee;
   display: flex;
+  justify-content: center;
   font-family: 'Muli', sans-serif;
 }
 
@@ -67,4 +68,46 @@ input[type="text"] {
 .existing-contract .complete {
   color: #5aa75a;
   text-align: center;
+}
+
+.header {
+  display: flex;
+  background-color: #d4dbd4;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 3px, solid, #eee;
+  border-radius: 10%;
+}
+
+.user {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #d4dbd4;
+  width: 100%;
+  border: 3px, solid, #eee;
+  border-radius: 10%;
+}
+
+.user > h4 {
+  margin: 0px 20px 20px 0px;
+}
+
+.network {
+  display: flex;
+  width: 100%;
+  background-color: #d4dbd4;
+  justify-content: center;
+  border: 3px, solid, #eee;
+  border-radius: 10%;
+
+}
+
+.network > h3 {
+  margin: 0;
+}
+
+.main {
+  display: flex;
 }
