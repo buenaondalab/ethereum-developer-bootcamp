@@ -16,6 +16,7 @@ import { ethers } from 'ethers';
 import { useState } from 'react';
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
+const tokensMetadata = new Map();
 
 function App() {
   const [account, setAccount] = useState();
@@ -23,7 +24,7 @@ function App() {
   const [userAddress, setUserAddress] = useState('');
   const [results, setResults] = useState([]);
   const [hasQueried, setHasQueried] = useState(false);
-  const [tokenDataObjects, setTokenDataObjects] = useState([]);
+  const [tokenDataObjects, setTokenDataObjects] = useState(Array.from(tokensMetadata.values()));
   const [isLoading, setIsLoading] = useState(false);
 
   const theme = useTheme();
@@ -37,22 +38,24 @@ function App() {
     };
 
     const alchemy = new Alchemy(config);
-    const data = await alchemy.core.getTokenBalances(userAddress);
-
-    setResults(data);
-
-    const tokenDataPromises = [];
-
-    for (let i = 0; i < data.tokenBalances.length; i++) {
-      const tokenData = alchemy.core.getTokenMetadata(
-        data.tokenBalances[i].contractAddress
-      );
-      tokenDataPromises.push(tokenData);
+    try {
+      const data = await alchemy.core.getTokenBalances(userAddress);
+      setResults(data);
+    
+      for (let bal of data.tokenBalances) {
+        const addr = bal.contractAddress;
+        const metadata = tokensMetadata.get(addr) || await alchemy.core.getTokenMetadata(addr);
+        tokensMetadata.set(addr, metadata);
+      }
+      console.log(tokensMetadata.values());
+      setTokenDataObjects(Array.from(tokensMetadata.values()));
+      setHasQueried(true);
+    } catch(e) {
+      console.error(e);
+      setResults([]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setTokenDataObjects(await Promise.all(tokenDataPromises));
-    setIsLoading(false);
-    setHasQueried(true);
   }
 
   async function getAccounts() {
