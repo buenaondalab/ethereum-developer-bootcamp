@@ -28,12 +28,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const theme = useTheme();
-  console.log(theme);
 
   async function getTokenBalance() {
     setIsLoading(true);
     const config = {
-      apiKey: '<-- COPY-PASTE YOUR ALCHEMY API KEY HERE -->',
+      apiKey: 'gqOaIIIUOciwYyiQmQatlXQGJ5plT-E8',
       network: Network.ETH_MAINNET,
     };
 
