@@ -27,14 +27,15 @@ function App() {
   const [tokenDataObjects, setTokenDataObjects] = useState(Array.from(tokensMetadata.values()));
   const [isLoading, setIsLoading] = useState(false);
 
+  const config = {
+    apiKey: 'gqOaIIIUOciwYyiQmQatlXQGJ5plT-E8',
+    network: Network.ETH_MAINNET,
+  };
+
   const theme = useTheme();
 
   async function getTokenBalance() {
     setIsLoading(true);
-    const config = {
-      apiKey: 'gqOaIIIUOciwYyiQmQatlXQGJ5plT-E8',
-      network: Network.ETH_MAINNET,
-    };
 
     const alchemy = new Alchemy(config);
     try {
@@ -61,7 +62,7 @@ function App() {
     const accounts = await provider.send('eth_requestAccounts', []);
     setAccount(accounts[0]);
     setUserAddress(accounts[0]);
-    setNetwork((await provider.getNetwork()).name);
+    setNetwork(config.network);
   };
 
   const columns = useBreakpointValue({
