@@ -47,7 +47,6 @@ function App() {
         const metadata = tokensMetadata.get(addr) || await alchemy.core.getTokenMetadata(addr);
         tokensMetadata.set(addr, metadata);
       }
-      console.log(tokensMetadata.values());
       setTokenDataObjects(Array.from(tokensMetadata.values()));
       setHasQueried(true);
     } catch(e) {

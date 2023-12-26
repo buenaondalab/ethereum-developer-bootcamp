@@ -1,54 +1,97 @@
 import {
   Box,
   Button,
-  Center,
+  CircularProgress,
   Flex,
   Heading,
   Image,
   Input,
   SimpleGrid,
   Text,
+  useBreakpointValue,
+  useTheme,
 } from '@chakra-ui/react';
 import { Alchemy, Network } from 'alchemy-sdk';
+import { ethers } from 'ethers';
 import { useState } from 'react';
+import IpfsImage from './IpfsImage'
+
+const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 function App() {
+  const [account, setAccount] = useState();
+  const [network, setNetwork] = useState();
   const [userAddress, setUserAddress] = useState('');
   const [results, setResults] = useState([]);
   const [hasQueried, setHasQueried] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const config = {
+    apiKey: 'ySrSWZFSgtdrJKB3eWsgWKzGvSjDXLkK',
+    network: Network.ETH_GOERLI,
+  };
+
+  const theme = useTheme();
 
   async function getNFTsForOwner() {
-    const config = {
-      apiKey: 'gqOaIIIUOciwYyiQmQatlXQGJ5plT-E8',
-      network: Network.ETH_MAINNET,
-    };
+    setIsLoading(true);
 
     const alchemy = new Alchemy(config);
-    const data = await alchemy.nft.getNftsForOwner(userAddress);
-    setResults(data);
-
-    const tokenDataPromises = [];
-
-    for (let i = 0; i < data.ownedNfts.length; i++) {
-      const tokenData = alchemy.nft.getNftMetadata(
-        data.ownedNfts[i].contract.address,
-        data.ownedNfts[i].tokenId
-      );
-      tokenDataPromises.push(tokenData);
+    try {
+      const data = await alchemy.nft.getNftsForOwner(userAddress);
+      setResults(data);
+  
+      const nfts = [];
+  
+      for (let nft of data.ownedNfts) {
+        const metadata = await alchemy.nft.getNftMetadata(
+          nft.contract.address,
+          nft.tokenId,
+          {tokenType: 'ERC721'}
+        );
+        console.log(metadata);
+        nfts.push(metadata);
+      }
+  
+      setTokenDataObjects(nfts);
+    } catch(e) {
+      console.error(e);
+      setResults([]);
+    } finally {
+      setHasQueried(true);
+      setIsLoading(false);
     }
-
-    setTokenDataObjects(await Promise.all(tokenDataPromises));
-    setHasQueried(true);
   }
+
+  async function getAccounts() {
+    const accounts = await provider.send('eth_requestAccounts', []);
+    setAccount(accounts[0]);
+    setUserAddress(accounts[0]);
+    setNetwork(config.network);
+  };
+
+  const columns = useBreakpointValue({
+    base: 1,
+    sm: 2,
+    md: 4,
+    xl: 6,
+    "2xl": 8,
+  },{
+    fallback: 'md',
+  });
+
   return (
     <Box w="100vw">
-      <Center>
         <Flex
           alignItems={'center'}
-          justifyContent="center"
+          justifyContent="flex-start"
           flexDirection={'column'}
         >
+          {account && <Text mb="0">{account}</Text>}
+          <Button mt="13px" onClick={getAccounts} _hover={{bgColor: theme.colors.gray[600], cursor: 'pointer'}}>
+            {account  ? `Connected on ${network}` : "Connect your wallet!"}
+          </Button>
           <Heading mb={0} fontSize={36}>
             NFT Indexer 🖼
           </Heading>
@@ -56,7 +99,6 @@ function App() {
             Plug in an address and this website will return all of its NFTs!
           </Text>
         </Flex>
-      </Center>
       <Flex
         w="100%"
         flexDirection="column"
@@ -72,22 +114,22 @@ function App() {
           p={4}
           bgColor="white"
           fontSize={24}
+          value={userAddress}
         />
-        <Button fontSize={20} onClick={getNFTsForOwner} mt={36} bgColor="blue">
+        <Button fontSize={20} onClick={getNFTsForOwner} mt={'36px'} _hover={{bgColor: theme.colors.gray[600], cursor: 'pointer'}}>
           Fetch NFTs
         </Button>
 
-        <Heading my={36}>Here are your NFTs:</Heading>
+        <Heading my={'36px'}>Here are your NFTs:</Heading>
 
-        {hasQueried ? (
-          <SimpleGrid w={'90vw'} columns={4} spacing={24}>
+        {isLoading && <CircularProgress mt="13px" isIndeterminate color='green' />}
+        {hasQueried && isLoading === false ? (
+          <SimpleGrid w={'90vw'} columns={columns} spacing={24}>
             {results.ownedNfts.map((e, i) => {
               return (
                 <Flex
                   flexDir={'column'}
                   color="white"
-                  bg="blue"
-                  w={'20vw'}
                   key={e.id}
                 >
                   <Box>
@@ -98,17 +140,17 @@ function App() {
                   </Box>
                   <Image
                     src={
-                      tokenDataObjects[i]?.rawMetadata?.image ??
+                      tokenDataObjects[i]?.media?.[0].gateway ??
                       'https://via.placeholder.com/200'
                     }
-                    alt={'Image'}
+                    alt={'NFT Image'}
                   />
                 </Flex>
               );
             })}
           </SimpleGrid>
         ) : (
-          'Please make a query! The query may take a few seconds...'
+          isLoading === false ? 'Please make a query! This may take a few seconds...' : ''
         )}
       </Flex>
     </Box>
