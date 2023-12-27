@@ -41,7 +41,7 @@ function App() {
     try {
       const data = await alchemy.nft.getNftsForOwner(userAddress, {pageKey, pageSize});
       setNextPage(data.pageKey);
-      setNfts(data.ownedNfts);
+      setNfts(data.ownedNfts.filter(t => t.tokenType === "ERC721").filter(t => t.media.length > 0 || t.title !== ""));
       setHasQueried(true);
       setIsLoading(false);
     } catch(e) {
