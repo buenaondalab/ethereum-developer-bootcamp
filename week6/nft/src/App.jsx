@@ -14,7 +14,6 @@ import {
 import { Alchemy, Network } from 'alchemy-sdk';
 import { ethers } from 'ethers';
 import { useState } from 'react';
-import IpfsImage from './IpfsImage'
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -22,45 +21,31 @@ function App() {
   const [account, setAccount] = useState();
   const [network, setNetwork] = useState();
   const [userAddress, setUserAddress] = useState('');
-  const [results, setResults] = useState([]);
+  const [nfts, setNfts] = useState([]);
+  const [nextPage, setNextPage] = useState();
   const [hasQueried, setHasQueried] = useState(false);
-  const [tokenDataObjects, setTokenDataObjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const config = {
-    apiKey: 'ySrSWZFSgtdrJKB3eWsgWKzGvSjDXLkK',
-    network: Network.ETH_GOERLI,
+    apiKey: 'gqOaIIIUOciwYyiQmQatlXQGJ5plT-E8',
+    network: Network.ETH_MAINNET,
   };
+  const alchemy = new Alchemy(config);
 
   const theme = useTheme();
 
-  async function getNFTsForOwner() {
-    setIsLoading(true);
+  const pageSize = 48;
 
-    const alchemy = new Alchemy(config);
+  async function getNFTsForOwner(pageKey) {
+    setIsLoading(true);
     try {
-      const data = await alchemy.nft.getNftsForOwner(userAddress);
-      setResults(data);
-  
-      const nfts = [];
-  
-      for (let nft of data.ownedNfts) {
-        const metadata = await alchemy.nft.getNftMetadata(
-          nft.contract.address,
-          nft.tokenId,
-          {tokenType: 'ERC721'}
-        );
-        console.log(metadata);
-        nfts.push(metadata);
-      }
-  
-      setTokenDataObjects(nfts);
-    } catch(e) {
-      console.error(e);
-      setResults([]);
-    } finally {
+      const data = await alchemy.nft.getNftsForOwner(userAddress, {pageKey, pageSize});
+      setNextPage(data.pageKey);
+      setNfts(data.ownedNfts);
       setHasQueried(true);
       setIsLoading(false);
+    } catch(e) {
+      console.error(e);
     }
   }
 
@@ -116,39 +101,42 @@ function App() {
           fontSize={24}
           value={userAddress}
         />
-        <Button fontSize={20} onClick={getNFTsForOwner} mt={'36px'} _hover={{bgColor: theme.colors.gray[600], cursor: 'pointer'}}>
+        <Button fontSize={20} onClick={() => getNFTsForOwner()} mt={'36px'} _hover={{bgColor: theme.colors.gray[600], cursor: 'pointer'}}>
           Fetch NFTs
         </Button>
 
-        <Heading my={'36px'}>Here are your NFTs:</Heading>
 
         {isLoading && <CircularProgress mt="13px" isIndeterminate color='green' />}
         {hasQueried && isLoading === false ? (
-          <SimpleGrid w={'90vw'} columns={columns} spacing={24}>
-            {results.ownedNfts.map((e, i) => {
-              return (
-                <Flex
-                  flexDir={'column'}
-                  color="white"
-                  key={e.id}
-                >
-                  <Box>
-                    <b>Name:</b>{' '}
-                    {tokenDataObjects[i].title?.length === 0
-                      ? 'No Name'
-                      : tokenDataObjects[i].title}
-                  </Box>
-                  <Image
-                    src={
-                      tokenDataObjects[i]?.media?.[0].gateway ??
-                      'https://via.placeholder.com/200'
-                    }
-                    alt={'NFT Image'}
-                  />
-                </Flex>
-              );
-            })}
-          </SimpleGrid>
+          <Flex flexDirection={'column'}>
+            <Heading my={'36px'}>Here are your NFTs:</Heading>
+            <SimpleGrid w={'90vw'} columns={columns} spacing={13}>
+              {nfts.map((e, i) => {
+                return (
+                  <Flex
+                    flexDir={'column'}
+                    color="white"
+                    key={e.id}
+                  >
+                    <Box>
+                      <b>Name:</b>{' '}
+                      {nfts[i].title?.length === 0
+                        ? 'No Name'
+                        : nfts[i].title}
+                    </Box>
+                    <Image
+                      src={
+                        nfts[i]?.media?.[0]?.gateway ??
+                        'https://via.placeholder.com/200'
+                      }
+                      alt={'NFT Image'}
+                    />
+                  </Flex>
+                );
+              })}
+            </SimpleGrid>
+            {nextPage && <Button alignSelf="flex-end" p="2" my="3" variant={"link"} onClick={() => getNFTsForOwner(nextPage)}>NEXT</Button>}
+          </Flex>
         ) : (
           isLoading === false ? 'Please make a query! This may take a few seconds...' : ''
         )}
